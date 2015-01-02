@@ -1,0 +1,10 @@
+Library
+*.pidb
+Temp
+*.csproj
+*.sln
+*.userprefs
+*.unityproj
+.DS_Store
+Icon
+Icon^M^M
