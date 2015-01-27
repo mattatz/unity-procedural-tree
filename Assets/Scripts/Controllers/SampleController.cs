@@ -31,7 +31,7 @@ public class Controller : MonoBehaviour {
 
 	void OnDrawGizmos () {
 		Gizmos.color = Color.white;
-		Gizmos.DrawWireSphere(transform.position, radius);
+		// Gizmos.DrawWireSphere(transform.position, radius);
 	}
 
 }

@@ -1,17 +1,19 @@
-﻿Shader "Mattatz/GenerativeTree" {
+﻿Shader "Mattatz/Planet" {
+
 	Properties {
 		_MainTex ("Base (RGB)", 2D) = "white" {}
 	}
+	
 	SubShader {
 		Tags { 
 			"RenderType"="Opaque"
 			"Queue"="Transparent"
 		}
+		
 		LOD 200
-		ZWrite On
-		Cull Back
 		
 		CGPROGRAM
+		
 		#pragma surface surf Lambert
 
 		sampler2D _MainTex;
@@ -21,13 +23,12 @@
 		};
 
 		void surf (Input IN, inout SurfaceOutput o) {
-			float2 uv = IN.uv_MainTex;
-			uv.y = fmod(uv.y * 10, 1.0);
-			half4 c = tex2D (_MainTex, uv);
+			half4 c = tex2D (_MainTex, IN.uv_MainTex);
 			o.Albedo = c.rgb;
-			o.Emission = c.rgb * 0.2;
+			o.Emission = c.rgb;
 			o.Alpha = c.a;
 		}
+		
 		ENDCG
 	} 
 	FallBack "Diffuse"

@@ -225,7 +225,7 @@ namespace Mattatz {
 					int[] keys = _childrenIndices.Keys.ToArray ();
 					for(int i = 0, n = keys.Length; i < n; i++) {
 						int sidx = _childrenIndices[keys[i]];
-						if(sidx <= _previousSegmentIndex + 1) {
+						if(sidx < _previousSegmentIndex + 1) {
 							return true;
 						}
 					}
@@ -233,13 +233,12 @@ namespace Mattatz {
 				}
 
 				public Branch EmitChild () {
-					// int segmentIndex = (int)(_branch.segmentHeight * _frame);
 					int[] keys = _childrenIndices.Keys.ToArray ();
 
 					for(int i = 0, n = keys.Length; i < n; i++) {
 						int key = keys[i];
 						int sidx = _childrenIndices[key];
-						if(sidx <= _previousSegmentIndex + 1) {
+						if(sidx < _previousSegmentIndex + 1) {
 							_childrenIndices.Remove(key);
 							return _branch.branches[key];
 						}

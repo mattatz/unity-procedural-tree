@@ -12,9 +12,6 @@ namespace Mattatz {
 
 	namespace GenerativeTree {
 
-		/*
-		 * 
-		 */
 		public class Branch {
 
 			#region Accessor
@@ -70,7 +67,6 @@ namespace Mattatz {
 				heightReductionRateMax = 0.9f,
 				childSegmentFromMin = 0.2f,
 				childSegmentFromMax = 0.9f,
-				spread = 0.3f,
 				bendingNoise = 0.3f,
 				bendingScale = 1.1f;
 
@@ -110,15 +106,14 @@ namespace Mattatz {
 
 			#region Public Functions
 
-			public static Branch LoadPreset (Vector3 start, Vector3 direction, GenerativeTreePreset preset) {
-				Branch branch = new Branch(start, direction, preset.height, preset.radius, preset.generation, preset.childCount);
+			public static Branch LoadPreset (Vector3 direction, Preset preset) {
+				Branch branch = new Branch(Vector3.zero, direction, preset.height, preset.radius, preset.generation, preset.childCount);
 				branch.segmentHeight = preset.segmentHeight ;
 				branch.segmentWidth = preset.segmentWidth;
 				branch.segmentNoise = preset.segmentNoise;
 				branch.radiusReductionRate = preset.radiusReductionRate;
 				branch.heightReductionRateMin = preset.heightReductionRateMin; 
 				branch.heightReductionRateMax = preset.heightReductionRateMax;
-				branch.spread = preset.spread;
 				branch.bendingNoise = preset.bendingNoise;
 				branch.bendingScale = preset.bendingScale;
 				return branch;
@@ -236,15 +231,19 @@ namespace Mattatz {
 
 					Vector3 current = CubicHermiteCurve.GetPoint(_start, _end, _tangent0, _tangent1, t);
 					Vector3 next = CubicHermiteCurve.GetPoint(_start, _end, _tangent0, _tangent1, (float)(i + 1) / segmentHeight);
-
 					segment.position = current; 
+
 					if(i == 0 && _from != null) {
 						segment.points = _from.points;
-						// segment.position = _from.position; 
+						segment.rotation = _from.rotation;
+					} else if (i != 0 && _from != null) {
+						Segment ps = _segments[i - 1];
+						Quaternion to = Quaternion.FromToRotation(ps.rotation * Vector3.up, (next - current).normalized);
+						segment.rotation = to * ps.rotation;
+					} else {
+						Quaternion rot = Quaternion.LookRotation((next - current).normalized);
+						segment.rotation = Quaternion.FromToRotation(rot * Vector3.back, rot * Vector3.up) * rot;
 					}
-
-					Quaternion rot = Quaternion.LookRotation(next - segment.position);
-					segment.rotation = Quaternion.FromToRotation(rot * Vector3.back, rot * Vector3.up) * rot;
 
 					_segments[i] = segment;
 				}
@@ -260,11 +259,10 @@ namespace Mattatz {
 					int segmentIndex = (i == n - 1) ? segmentHeight - 1 : (int)(segmentHeight * UnityEngine.Random.Range(childSegmentFromMin, childSegmentFromMax));
 					Segment segment = _segments[segmentIndex];
 
-					Vector3 cdirection = segment.rotation * (Vector3.up * (1f - spread) + (i % 2 == remainder ? Vector3.right : Vector3.left) * spread).normalized;
 					float cheight = _height * UnityEngine.Random.Range(heightReductionRateMin, heightReductionRateMax);
 					float cradius = (segmentIndex == segmentHeight - 1) ? segment.radius : segment.radius * UnityEngine.Random.Range(0.7f, 0.85f);
 
-					Branch branch = new Branch(segment.position, cdirection, cheight, cradius, _generation - 1, _childCount);
+					Branch branch = new Branch(segment.position, segment.rotation * Vector3.up, cheight, cradius, _generation - 1, _childCount);
 					branch._generationLength = _generationLength;
 					if(segmentIndex == segmentHeight - 1) {
 						// for smooth curve.
@@ -290,8 +288,6 @@ namespace Mattatz {
 				target.radiusReductionRate = radiusReductionRate;
 				target.heightReductionRateMin = heightReductionRateMin;
 				target.heightReductionRateMax = heightReductionRateMax;
-
-				target.spread = spread;
 
 				target.bendingNoise = bendingNoise;
 				target.bendingScale = bendingScale;
@@ -373,10 +369,6 @@ namespace Mattatz {
 
 				float uvYDelta = 1f / _generationLength;
 				float uvYStart = uvYDelta * (_generationLength - _generation);
-				if(_from != null) {
-					float fromSegmentRatio = 1.0f - (float)_fromSegmentIndex / segmentHeight;
-					uvYStart -= uvYDelta * fromSegmentRatio;
-				}
 
 				for(int i = 0, n = _segments.Length; i < n; i++) {
 
