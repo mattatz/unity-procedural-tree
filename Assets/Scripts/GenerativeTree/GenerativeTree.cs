@@ -88,7 +88,6 @@ namespace mattatz {
 			private int _generationLength;
 
 			private Segment _from;
-			private int _fromSegmentIndex;
 			private Segment[] _segments;
 
 			/*
@@ -130,7 +129,6 @@ namespace mattatz {
 
 			public Mesh Build (Segment from = null, int fromSegmentIndex = -1) {
 				_from = from;
-				_fromSegmentIndex = fromSegmentIndex;
 
 				if(_from == null) { // root 
 					_generationLength = _generation;
@@ -253,8 +251,6 @@ namespace mattatz {
 			private void BranchChildren () {
 				int childCount = UnityEngine.Random.Range(2, _childCount);
 				_branches = new Branch[childCount];
-
-				int remainder = UnityEngine.Random.value < 0.5f ? 0 : 1;
 
 				for(int i = 0, n = childCount; i < n; i++) {
 					int segmentIndex = (i == n - 1) ? segmentHeight - 1 : (int)(segmentHeight * UnityEngine.Random.Range(childSegmentFromMin, childSegmentFromMax));

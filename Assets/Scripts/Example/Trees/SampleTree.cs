@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Random = UnityEngine.Random;
 
 using System.Collections;
 
@@ -24,9 +25,8 @@ public class SampleTree : MonoBehaviour {
 	}
 
 	void Init () {
-
 		if(useRandomSeed) {
-			UnityEngine.Random.seed = randomSeed;
+            Random.InitState(randomSeed);
 		}
 
 		// GenerativeTreePreset preset = GetComponent<GenerativeTreePreset>();
@@ -35,9 +35,8 @@ public class SampleTree : MonoBehaviour {
 		GetComponent<MeshFilter>().sharedMesh = _branch.mesh;
 
 		if(useRandomSeed) {
-			UnityEngine.Random.seed = System.DateTime.Now.Second;
+            Random.InitState(System.DateTime.Now.Second);
 		}
-
 	}
 
 	void OnValidate () {
