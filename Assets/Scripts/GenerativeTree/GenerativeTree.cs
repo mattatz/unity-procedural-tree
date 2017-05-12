@@ -5,10 +5,10 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-using Mattatz.GenerativeTree.Animator;
-using Mattatz.GenerativeTree.Utils;
+using mattatz.GenerativeTree.Animator;
+using mattatz.GenerativeTree.Utils;
 
-namespace Mattatz {
+namespace mattatz {
 
 	namespace GenerativeTree {
 
@@ -128,7 +128,7 @@ namespace Mattatz {
 				_childCount = childCount;
 			}
 
-			public void Build (Segment from = null, int fromSegmentIndex = -1) {
+			public Mesh Build (Segment from = null, int fromSegmentIndex = -1) {
 				_from = from;
 				_fromSegmentIndex = fromSegmentIndex;
 
@@ -150,6 +150,7 @@ namespace Mattatz {
 					_mesh.RecalculateNormals();
 				}
 
+                return _mesh;
 			}
 
 			public Branch[] GetChildren (int generation) {
@@ -428,7 +429,6 @@ namespace Mattatz {
 			}
 
 			#endregion
-
 		}
 
 		public class Segment {

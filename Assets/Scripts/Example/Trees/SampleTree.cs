@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 
 using System.Collections;
-using Mattatz.GenerativeTree;
-using Mattatz.GenerativeTree.Utils;
+
+using mattatz.GenerativeTree;
+using mattatz.GenerativeTree.Utils;
 
 [ExecuteInEditMode]
 [RequireComponent (typeof (MeshRenderer))]

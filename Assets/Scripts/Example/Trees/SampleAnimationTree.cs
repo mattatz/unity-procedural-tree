@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-using Mattatz.GenerativeTree;
-using Mattatz.GenerativeTree.Utils;
-using Mattatz.GenerativeTree.Animator;
+using mattatz.GenerativeTree;
+using mattatz.GenerativeTree.Utils;
+using mattatz.GenerativeTree.Animator;
 
 [RequireComponent (typeof (MeshRenderer))]
 [RequireComponent (typeof (MeshFilter))]

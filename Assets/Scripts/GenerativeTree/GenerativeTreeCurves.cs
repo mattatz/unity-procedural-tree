@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Mattatz {
+namespace mattatz {
 
 	namespace GenerativeTree {
 

@@ -1,11 +1,11 @@
-﻿Shader "Mattatz/GenerativeTree" {
+﻿Shader "mattatz/GenerativeTree" {
+
 	Properties {
 		_MainTex ("Base (RGB)", 2D) = "white" {}
 	}
 	SubShader {
 		Tags { 
 			"RenderType"="Opaque"
-			"Queue"="Transparent"
 		}
 		LOD 200
 		ZWrite On

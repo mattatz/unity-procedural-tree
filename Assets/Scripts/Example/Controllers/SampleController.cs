@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Controller : MonoBehaviour {
+public class SampleController : MonoBehaviour {
 
 	#region Public Variables
 
