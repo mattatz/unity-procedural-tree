@@ -1,29 +1,29 @@
-unity-generative-tree
+unity-procedural-tree
 =====================
 
-Generative tree for unity3d.
+Procedural tree builder for Unity.
 
-![sample tree](https://raw.githubusercontent.com/mattatz/unity-generative-tree/master/Captures/sample-tree.png)
+![Demo](https://raw.githubusercontent.com/mattatz/unity-procedural-tree/master/Captures/Demo.gif)
 
-It is able to animate to grow easily.
+## Usage
 
-![sample animation tree](https://raw.githubusercontent.com/mattatz/unity-generative-tree/master/Captures/sample-animation-tree.gif)
+TreeData class has properties of ProceduralTree.
 
-## Preset 
+![TreeData](https://raw.githubusercontent.com/mattatz/unity-procedural-tree/master/Captures/TreeData.png)
 
-unity-generative-tree prepares tree preset.
-
-![tree preset](https://raw.githubusercontent.com/mattatz/unity-generative-tree/master/Captures/tree-preset.png)
-
-## Example
+Setup a TreeData instance and pass it to ProceduralTree.Build function.
 
 ```cs
-Branch branch = Branch.LoadPreset(Vector3.up, preset);
-branch.Build();
-GetComponent<MeshFilter>().sharedMesh = branch.mesh;
+// Setup TreeData for properties of ProceduralTree
+TreeData data = new TreeData();
+// data.randomSeed = 100;
+// data.branchesMin = 1; data.branchesMax = 3;
+
+Mesh mesh = ProceduralTree.Build(
+    data,
+    6, // generations of a tree
+    1.5f, // base height of a tree
+    0.15f // base radius of a tree
+);
 ```
-
-## Demo
-
-[Unity Web Player](https://mattatz.github.io/unity/generative-tree)
 
