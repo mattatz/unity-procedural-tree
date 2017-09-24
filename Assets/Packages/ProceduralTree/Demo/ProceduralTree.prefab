@@ -36,13 +36,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1856826850138188}
-  m_LocalRotation: {x: -0, y: -0.24998118, z: -0, w: -0.96825075}
-  m_LocalPosition: {x: 0.2166717, y: 0, z: -0.58714867}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.29999995, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: -331.047, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &23659821880543676
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -110,11 +110,12 @@ MonoBehaviour:
     radiusAttenuation: 0.537
     branchesMin: 2
     branchesMax: 3
-    angleMin: -19
-    angleMax: 28
-    heightSegments: 12
+    angleMin: -15
+    angleMax: 15
+    angleScale: 3
+    heightSegments: 10
     radialSegments: 8
-    bendDegree: 0.052
+    bendDegree: 0.2
   generations: 5
-  length: 1.17
+  length: 1.25
   radius: 0.18

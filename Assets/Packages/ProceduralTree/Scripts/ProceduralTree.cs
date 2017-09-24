@@ -56,7 +56,7 @@ namespace ProceduralModeling {
 
 						float cos = Mathf.Cos(rad), sin = Mathf.Sin(rad);
 						var normal = (cos * N + sin * B).normalized;
-						vertices.Add(segment.Position + Mathf.Lerp(branch.FromRadius, branch.ToRadius, t) * normal);
+						vertices.Add(segment.Position + segment.Radius * normal);
 						normals.Add(normal);
 
 						var tangent = segment.Frame.Tangent;
@@ -123,6 +123,7 @@ namespace ProceduralModeling {
 		[Range(0.25f, 0.95f)] public float lengthAttenuation = 0.8f, radiusAttenuation = 0.5f;
 		[Range(1, 3)] public int branchesMin = 1, branchesMax = 3;
 		[Range(-90f, 90f)] public float angleMin = -23f, angleMax = 23f;
+        [Range(1f, 10f)] public float angleScale = 4f;
 		[Range(4, 20)] public int heightSegments = 10, radialSegments = 8;
 		[Range(0.0f, 0.35f)] public float bendDegree = 0.1f;
 
@@ -159,9 +160,6 @@ namespace ProceduralModeling {
 		public float Length { get { return length; } } 
 		public float Offset { get { return offset; } }
 
-		public float FromRadius { get { return fromRadius; } }
-		public float ToRadius { get { return toRadius; } }
-
 		int generation;
 
 		List<TreeSegment> segments;
@@ -173,10 +171,10 @@ namespace ProceduralModeling {
 		float offset;
 
 		// for Root branch constructor
-		public TreeBranch(int generation, float length, float radius, TreeData data) : this(generation, Vector3.zero, Vector3.up, Vector3.right, Vector3.back, length, radius, 0f, data) {
+		public TreeBranch(int generation, float length, float radius, TreeData data) : this(new List<TreeBranch>(), generation, generation, Vector3.zero, Vector3.up, Vector3.right, Vector3.back, length, radius, 0f, data) {
 		}
 
-		protected TreeBranch(int generation, Vector3 from, Vector3 tangent, Vector3 normal, Vector3 binormal, float length, float radius, float offset, TreeData data) {
+		protected TreeBranch(List<TreeBranch> branches, int generation, int generations, Vector3 from, Vector3 tangent, Vector3 normal, Vector3 binormal, float length, float radius, float offset, TreeData data) {
 			this.generation = generation;
 
 			this.fromRadius = radius;
@@ -184,30 +182,53 @@ namespace ProceduralModeling {
 
 			this.from = from;
 
-			var rotation = Quaternion.AngleAxis(data.GetRandomAngle(), normal) * Quaternion.AngleAxis(data.GetRandomAngle(), binormal);
-			this.to = from + rotation * tangent * length;
+            var scale = Mathf.Lerp(1f, data.angleScale, 1f - 1f * generation / generations);
+            var rotation = Quaternion.AngleAxis(scale * data.GetRandomAngle(), normal) * Quaternion.AngleAxis(scale * data.GetRandomAngle(), binormal);
+            this.to = from + rotation * tangent * length;
+
 			this.length = length;
 			this.offset = offset;
 
-			segments = BuildSegments(data, radius, normal, binormal);
+			segments = BuildSegments(data, fromRadius, toRadius, normal, binormal);
+
+            branches.Add(this);
 
 			children = new List<TreeBranch>();
 			if(generation > 0) {
-				int branches = data.GetRandomBranches();
-				for(int i = 0; i < branches; i++) {
-					// 一番初めの枝は一続きの枝にする
-					bool sequence = (i == 0);
+				int count = data.GetRandomBranches();
+				for(int i = 0; i < count; i++) {
+                    float ratio;
+                    if(count == 1)
+                    {
+                        // for zero division
+                        ratio = 1f;
+                    } else
+                    {
+                        ratio = Mathf.Lerp(0.5f, 1f, (1f * i) / (count - 1));
+                    }
 
-					int index = sequence ? segments.Count - 1 : data.Range(1, segments.Count - 1);
-					var ratio = 1f * index / (segments.Count - 1);
-
+                    var index = Mathf.FloorToInt(ratio * (segments.Count - 1));
 					var segment = segments[index];
-					var nt = segment.Frame.Tangent;
-					var nn = segment.Frame.Normal;
-					var nb = segment.Frame.Binormal;
+
+                    Vector3 nt, nn, nb;
+                    if(ratio >= 1f)
+                    {
+                        // sequence branch
+                        nt = segment.Frame.Tangent;
+                        nn = segment.Frame.Normal;
+                        nb = segment.Frame.Binormal;
+                    } else
+                    {
+                        var rot = Quaternion.AngleAxis(data.GetRandomAngle(), normal) * Quaternion.AngleAxis(data.GetRandomAngle(), binormal);
+                        nt = rot * tangent;
+                        nn = rot * normal;
+                        nb = rot * binormal;
+                    }
 
 					var child = new TreeBranch(
+                        branches,
 						this.generation - 1, 
+                        generations,
 						segment.Position, 
 						nt, 
 						nn, 
@@ -223,7 +244,7 @@ namespace ProceduralModeling {
 			}
 		}
 
-		List<TreeSegment> BuildSegments (TreeData data, float radius, Vector3 normal, Vector3 binormal) {
+		List<TreeSegment> BuildSegments (TreeData data, float fromRadius, float toRadius, Vector3 normal, Vector3 binormal) {
 			var segments = new List<TreeSegment>();
 
 			var points = new List<Vector3>();
@@ -240,25 +261,30 @@ namespace ProceduralModeling {
 			var frames = curve.ComputeFrenetFrames(data.heightSegments, normal, binormal, false);
 			for(int i = 0, n = frames.Count; i < n; i++) {
 				var u = 1f * i / (n - 1);
+                var radius = Mathf.Lerp(fromRadius, toRadius, u);
+
 				var position = curve.GetPointAt(u);
-				var segment = new TreeSegment(frames[i], position);
+				var segment = new TreeSegment(frames[i], position, radius);
 				segments.Add(segment);
 			}
 			return segments;
 		}
-		
+
 	}
 
 	public class TreeSegment {
 		public FrenetFrame Frame { get { return frame; } }
 		public Vector3 Position { get { return position; } }
+        public float Radius { get { return radius; } }
 
 		FrenetFrame frame;
 		Vector3 position;
+        float radius;
 
-		public TreeSegment(FrenetFrame frame, Vector3 position) {
+		public TreeSegment(FrenetFrame frame, Vector3 position, float radius) {
 			this.frame = frame;
 			this.position = position;
+            this.radius = radius;
 		}
 	}
 
