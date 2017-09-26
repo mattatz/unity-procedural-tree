@@ -122,8 +122,10 @@ namespace ProceduralModeling {
 		public int randomSeed = 0;
 		[Range(0.25f, 0.95f)] public float lengthAttenuation = 0.8f, radiusAttenuation = 0.5f;
 		[Range(1, 3)] public int branchesMin = 1, branchesMax = 3;
-		[Range(-90f, 90f)] public float angleMin = -23f, angleMax = 23f;
-        [Range(1f, 10f)] public float angleScale = 4f;
+        [Range(-45f, 0f)] public float growthAngleMin = -15f;
+        [Range(0f, 45f)] public float growthAngleMax = 15f;
+        [Range(1f, 10f)] public float growthAngleScale = 4f;
+        [Range(0f, 45f)] public float branchingAngle = 15f;
 		[Range(4, 20)] public int heightSegments = 10, radialSegments = 8;
 		[Range(0.0f, 0.35f)] public float bendDegree = 0.1f;
 
@@ -137,12 +139,16 @@ namespace ProceduralModeling {
 			return rnd.Range(a, b);
 		}
 
+		public float Range(float a, float b) {
+			return rnd.Range(a, b);
+		}
+
 		public int GetRandomBranches() {
 			return rnd.Range(branchesMin, branchesMax + 1);
 		}
 
-		public float GetRandomAngle() {
-			return rnd.Range(angleMin, angleMax);
+		public float GetRandomGrowthAngle() {
+			return rnd.Range(growthAngleMin, growthAngleMax);
 		}
 
 		public float GetRandomBendDegree() {
@@ -182,8 +188,8 @@ namespace ProceduralModeling {
 
 			this.from = from;
 
-            var scale = Mathf.Lerp(1f, data.angleScale, 1f - 1f * generation / generations);
-            var rotation = Quaternion.AngleAxis(scale * data.GetRandomAngle(), normal) * Quaternion.AngleAxis(scale * data.GetRandomAngle(), binormal);
+            var scale = Mathf.Lerp(1f, data.growthAngleScale, 1f - 1f * generation / generations);
+            var rotation = Quaternion.AngleAxis(scale * data.GetRandomGrowthAngle(), normal) * Quaternion.AngleAxis(scale * data.GetRandomGrowthAngle(), binormal);
             this.to = from + rotation * tangent * length;
 
 			this.length = length;
@@ -219,7 +225,10 @@ namespace ProceduralModeling {
                         nb = segment.Frame.Binormal;
                     } else
                     {
-                        var rot = Quaternion.AngleAxis(data.GetRandomAngle(), normal) * Quaternion.AngleAxis(data.GetRandomAngle(), binormal);
+                        var phi = Quaternion.AngleAxis(i * 90f, tangent);
+                        // var psi = Quaternion.AngleAxis(data.branchingAngle, normal) * Quaternion.AngleAxis(data.branchingAngle, binormal);
+                        var psi = Quaternion.AngleAxis(data.branchingAngle, normal);
+                        var rot = phi * psi;
                         nt = rot * tangent;
                         nn = rot * normal;
                         nb = rot * binormal;

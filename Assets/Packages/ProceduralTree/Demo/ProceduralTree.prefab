@@ -110,9 +110,10 @@ MonoBehaviour:
     radiusAttenuation: 0.537
     branchesMin: 2
     branchesMax: 3
-    angleMin: -15
-    angleMax: 15
-    angleScale: 3
+    growthAngleMin: -15
+    growthAngleMax: 15
+    growthAngleScale: 4
+    branchingAngle: 15
     heightSegments: 10
     radialSegments: 8
     bendDegree: 0.2
