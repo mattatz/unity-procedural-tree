@@ -125,7 +125,6 @@ namespace ProceduralModeling {
         [Range(-45f, 0f)] public float growthAngleMin = -15f;
         [Range(0f, 45f)] public float growthAngleMax = 15f;
         [Range(1f, 10f)] public float growthAngleScale = 4f;
-        [Range(0f, 45f)] public float branchingAngle = 15f;
 		[Range(4, 20)] public int heightSegments = 10, radialSegments = 8;
 		[Range(0.0f, 0.35f)] public float bendDegree = 0.1f;
 
@@ -225,10 +224,7 @@ namespace ProceduralModeling {
                         nb = segment.Frame.Binormal;
                     } else
                     {
-                        var phi = Quaternion.AngleAxis(i * 90f, tangent);
-                        // var psi = Quaternion.AngleAxis(data.branchingAngle, normal) * Quaternion.AngleAxis(data.branchingAngle, binormal);
-                        var psi = Quaternion.AngleAxis(data.branchingAngle, normal);
-                        var rot = phi * psi;
+                        var rot = Quaternion.AngleAxis(i * 90f, tangent);
                         nt = rot * tangent;
                         nn = rot * normal;
                         nb = rot * binormal;
